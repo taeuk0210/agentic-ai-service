@@ -1,37 +1,34 @@
 # agentic-ai-service
+
 agentic ai service backbone structure
+
 ```bash
-유저(Client)      Agent(Orchestrator)    Auth/Guard/Intent/Tool    Infra(Cache/DB/VDB)
-     │                     │                     │                     │
-     │── 1. UserRequest ──▶│                     │                     │
-     │   (query, session)  │                     │                     │
-     │                     │── 2. UserContext 생성                     │
-     │                     │      (raw_query)    │                     │
-     │                     │                     │                     │
-     │                     │── 3. validate_input(raw_query) ──────────▶│
-     │                     │◀─ 4. clean_query 반환 ────────────────────│
-     │                     │                     │                     │
-     │                     │── 5. get_accessible_knowledge_sources() ─▶│
-     │                     │                     │                     │── 6. 권한 조회 (RDB)
-     │                     │◀─ 7. accessible_sources 반환 ─────────────│
-     │                     │                     │                     │
-     │                     │── 8. route_request(clean_query, sources) ▶│
-     │                     │◀─ 9. tool_name, params 반환 ──────────────│
-     │                     │                     │                     │
-     │                     │── 10. execute(tool_name, params) ────────▶│
-     │                     │                     │                     │── 11. 유사도 검색 (VDB)
-     │                     │◀─ 12. tool_result_context 반환 ───────────│
-     │                     │                     │                     │
-     │                     │── 13. generate_response(prompt) ─────────▶│ (LLM Service)
-     │                     │                     │                     │── 14. API 호출 (LLM Infra)
-     │                     │◀─ 15. llm_response 반환 ──────────────────│
-     │                     │                     │                     │
-     │                     │── 16. validate_output(llm_response) ─────▶│
-     │                     │◀─ 17. final_answer 반환 ──────────────────│
-     │                     │                     │                     │
-     │                     │──────────────────────────────────────────▶│ 18. 대화기록 세션 저장 (Redis)
-     │                     │──────────────────────────────────────────▶│ 19. 대화로그 및 피드백 영속 저장 (RDB)
-     │                     │                     │                     │
-     │◀─ 20. AgentResponse─│                     │                     │
-     │   (final_answer)    │                     │                     │
-     ```
+User(API)        Agent(Orchestrator)        Service(Chat/LLM/Tool)        Infra(Cache/LLM/VDB)
+    |                     |                           |                              |
+    |---- UserRequest --->|                           |                              |
+    |                     |------ validate_user ----->|                              |
+    |                     |    (세션ID, 접근권한)     |                              |
+    |                     |                           |                              |
+    |                     |---- validate_content ---->|                              |
+    |                     |     (user_input 검증)     |--(Prompt Injection 체크)->[ LLM ]
+    |                     |                           |                              |
+    |                     |--- get_chat_histories --->|                              |
+    |                     |   (이전 대화 목록 조회)   |---(과거 대화 이력 획득)-->[Cache]
+    |                     |                           |                              |
+    |                     |---- route_user_intent --->|                              |
+    |                     |   (의도 파악 및 라우팅)   |---(필요한 툴 목록 분류)-->[ LLM ]
+    |                     |                           |                              |
+    |                     |--- execute (Parallel) --->|                           [ API ]
+    |                     |   (비동기 툴 병렬실행)    |---(문서 검색/외부 API)--->[ VDB ]
+    |                     |                           |                           [EMBED]
+    |                     |--- request_user_input --->|                              |
+    |                     |   (최종 답변 생성 요청)   |--(컨텍스트 결합 후 추론)->[ LLM ]
+    |                     |                           |                              |
+    |                     |---- validate_content ---->|                              |
+    |                     |    (agent_output 검증)    |---(탈옥/정보 유출 체크)-->[ LLM ]
+    |                     |                           |                              |
+    |                     |--- set_chat_histories --->|                              |
+    |                     |   (신규 대화 이력 누적)   |--(대화 쌍 적재 및 갱신)-->[Cache]
+    |                     |                           |                              |
+    |<-- UserResponse ----|                           |                              |
+```
