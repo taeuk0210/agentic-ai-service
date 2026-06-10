@@ -6,8 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import config
 from app.logger import logger
-from app.schema import UserRequest, UserResponse
-from app.services.agent import agentic_service
+from app.schemas import UserRequest, UserResponse
 
 app = FastAPI(
     title="HACCP Agentic AI Service API",

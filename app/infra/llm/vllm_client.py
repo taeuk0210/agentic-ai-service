@@ -5,7 +5,7 @@ from openai import OpenAI
 from app.config import config
 from app.logger import logger
 from app.infra.llm.interface import BaseLLMClient
-from app.schema import LLMChat
+from app.schemas import LLMChat
 
 
 class VLLMClient(BaseLLMClient):

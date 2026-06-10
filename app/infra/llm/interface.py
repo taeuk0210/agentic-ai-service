@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from app.schema import LLMChat
+from app.schemas import LLMChat
 
 
 class BaseLLMClient(ABC):

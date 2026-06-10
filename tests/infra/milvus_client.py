@@ -1,7 +1,7 @@
 import uuid
 import unittest
 
-from app.schema import VectorCreateRequest, VectorQueryResponse
+from app.schemas import VectorCreateRequest, VectorQueryResponse
 from app.infra.vdb.milvus_client import milvus_client
 
 

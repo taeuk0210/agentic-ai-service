@@ -4,7 +4,7 @@ from pymilvus import MilvusClient
 
 from app.config import config
 from app.logger import logger
-from app.schema import VectorCreateRequest, VectorQueryResponse
+from app.schemas import VectorCreateRequest, VectorQueryResponse
 from app.infra.vdb.interface import BaseVectorDBClient
 
 

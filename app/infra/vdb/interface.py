@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
 
-from app.schema import VectorCreateRequest, VectorQueryResponse
+from app.schemas import VectorCreateRequest, VectorQueryResponse
 
 
 class BaseVectorDBClient(ABC):

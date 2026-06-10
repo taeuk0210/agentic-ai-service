@@ -1,6 +1,28 @@
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+
+
+@abstractmethod
+def route_user_intent(
+    self,
+    user_input: str,
+    accessible_collections: List[str],
+) -> List[Dict[str, Any]]:
+    pass
+
+
+@abstractmethod
+def request_user_input(
+    self,
+    user_input: str,
+    tool_contexts: List[Dict[str, Any]],
+) -> str:
+    pass
+
+
 from typing import Dict
 
-from app.schema import UserRequest, UserResponse, UserContext, LLMChat
+from app.schemas import UserRequest, UserResponse, UserContext, LLMChat
 from app.services.chat import BaseChatService
 from app.services.tool import BaseToolService
 from app.services.llm import BaseLLMService
@@ -60,14 +82,6 @@ class AgenticService:
             session_id=user_context.session_id,
             agent_response=user_context.agent_response,
         )
-
-    def training(self):
-        # TODO
-        pass
-
-    def evaluation(self):
-        # TODO
-        pass
 
 
 agentic_service = AgenticService()
