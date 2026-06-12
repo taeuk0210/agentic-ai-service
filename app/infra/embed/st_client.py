@@ -25,7 +25,7 @@ class SentenceTransformersEmbeddingClient(BaseEmbeddingClient):
             logger.error(f"SentenceTransformersEmbeddingClient.embedding() error: {e}")
             return []
 
-    def batch_embedding(self, texts: List[str]) -> List[List[float]]:
+    def embedding_batch(self, texts: List[str]) -> List[List[float]]:
         try:
             embeddings = self.model.encode_document(
                 inputs=texts,
@@ -37,7 +37,7 @@ class SentenceTransformersEmbeddingClient(BaseEmbeddingClient):
             return embeddings.tolist()
         except Exception as e:
             logger.error(
-                f"SentenceTransformersEmbeddingClient.batch_embedding() error: {e}"
+                f"SentenceTransformersEmbeddingClient.embedding_batch() error: {e}"
             )
             return []
 

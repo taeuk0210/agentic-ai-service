@@ -8,5 +8,5 @@ class BaseEmbeddingClient(ABC):
         pass
 
     @abstractmethod
-    def batch_embedding(self, texts: List[str]) -> List[List[float]]:
+    def embedding_batch(self, texts: List[str]) -> List[List[float]]:
         pass

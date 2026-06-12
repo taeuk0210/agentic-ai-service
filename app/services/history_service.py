@@ -1,14 +1,17 @@
-from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
 from app.schemas import LLMChat
 
 
-@abstractmethod
-def get_chat_histories(session_id: str) -> List[LLMChat]:
-    pass
+class HistoryService:
+    def __init__(self):
+        pass
+
+    def get_histories(session_id: str) -> List[LLMChat]:
+        pass
+
+    def set_histories(session_id: str, chats: List[LLMChat]) -> bool:
+        pass
 
 
-@abstractmethod
-def set_chat_histories(session_id: str, chats: List[LLMChat]) -> bool:
-    pass
+history_service = HistoryService()

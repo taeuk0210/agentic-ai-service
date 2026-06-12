@@ -1,43 +1,179 @@
-from uuid import UUID
-from typing import Optional, Dict, List, Any
-
 from pydantic import BaseModel
 
 from openai.types.chat import ChatCompletion
 
 
-class VectorCreateRequest(BaseModel):
-    uuid: Optional[UUID] = None
-    vector: List[float]
-    properties: Optional[Dict[str, Any]] = {}
+class VerifyUserRequest(BaseModel):
+    pass
 
 
-class VectorQueryResponse(BaseModel):
-    uuid: UUID
+class VerifyUserResponse(BaseModel):
+    pass
 
 
-class LLMChat(BaseModel):
-    role: str
-    content: str
+class SetHistoryRequest(BaseModel):
+    pass
 
 
-class UserRequest(BaseModel):
-    session_id: Optional[UUID] = None
-    user_input: str
+class SetHistoryResponse(BaseModel):
+    pass
 
 
-class UserContext(BaseModel):
-    session_id: Optional[UUID] = None
-    user_input: str
-    accessible_collections: List[str] = []
-    chat_histories: List[LLMChat]
-    tool_actions: List[Dict[str, Any]] = []
-    tool_contexts: List[Dict[str, Any]] = []
-    system_prompt: Optional[str] = None
-    user_prompt: Optional[str] = None
-    agent_response: Optional[str] = None
+class GetHistoryRequest(BaseModel):
+    pass
 
 
-class UserResponse(BaseModel):
-    session_id: UUID
-    agent_response: str
+class GetHistoryResponse(BaseModel):
+    pass
+
+
+class ClassifyIntentRequest(BaseModel):
+    pass
+
+
+class ClassifyIntentResponse(BaseModel):
+    pass
+
+
+class GenerateAnswerRequest(BaseModel):
+    pass
+
+
+class GenerateAnswerResponse(BaseModel):
+    pass
+
+
+class TrainRequest(BaseModel):
+    pass
+
+
+class TrainResponse(BaseModel):
+    pass
+
+
+class EvaluateRequest(BaseModel):
+    pass
+
+
+class EvaluateResponse(BaseModel):
+    pass
+
+
+class GetRequest(BaseModel):
+    pass
+
+
+class GetResponse(BaseModel):
+    pass
+
+
+class SetRequest(BaseModel):
+    pass
+
+
+class SetResponse(BaseModel):
+    pass
+
+
+class DeleteRequest(BaseModel):
+    pass
+
+
+class DeleteResponse(BaseModel):
+    pass
+
+
+class EmbeddingRequest(BaseModel):
+    pass
+
+
+class EmbeddingResponse(BaseModel):
+    pass
+
+
+class CreateCollectionRequest(BaseModel):
+    pass
+
+
+class CreateCollectionResponse(BaseModel):
+    pass
+
+
+class DeleteCollectionRequest(BaseModel):
+    pass
+
+
+class DeleteCollectionResponse(BaseModel):
+    pass
+
+
+class UpsertVectorsRequest(BaseModel):
+    pass
+
+
+class UpsertVectorsResponse(BaseModel):
+    pass
+
+
+class QueryVectorsRequest(BaseModel):
+    pass
+
+
+class QueryVectorsResponse(BaseModel):
+    pass
+
+
+class DeleteVectorsRequest(BaseModel):
+    pass
+
+
+class DeleteVectorsResponse(BaseModel):
+    pass
+
+
+class GenerateRequest(BaseModel):
+    pass
+
+
+class GenerateResponse(BaseModel):
+    pass
+
+
+class CreateBucketRequest(BaseModel):
+    pass
+
+
+class CreateBucketResponse(BaseModel):
+    pass
+
+
+class DeleteBucketRequest(BaseModel):
+    pass
+
+
+class DeleteBucketResponse(BaseModel):
+    pass
+
+
+class UploadFileRequest(BaseModel):
+    pass
+
+
+class UploadFileResponse(BaseModel):
+    pass
+
+
+class DownloadFileRequest(BaseModel):
+    pass
+
+
+class DownloadFileResponse(BaseModel):
+    pass
+
+
+class DeleteFileRequest(BaseModel):
+    pass
+
+
+class DeleteFileResponse(BaseModel):
+    pass

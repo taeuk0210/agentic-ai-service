@@ -18,7 +18,7 @@ class TestSentenceTransformerEmbeddingClient(unittest.TestCase):
         # then
         self.assertGreater(len(embedding), 0)
 
-    def test_batch_embedding(self) -> None:
+    def test_embedding_batch(self) -> None:
         # given
         test_texts = [
             "this is test sentence1.",
@@ -27,7 +27,7 @@ class TestSentenceTransformerEmbeddingClient(unittest.TestCase):
         ]
 
         # when
-        embeddings = self.client.batch_embedding(test_texts)
+        embeddings = self.client.embedding_batch(test_texts)
 
         # then
         self.assertEqual(len(test_texts), len(embeddings))
