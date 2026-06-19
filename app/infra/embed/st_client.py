@@ -13,7 +13,7 @@ class StEmbeddingClient(BaseEmbeddingClient):
             model_name_or_path=config.EMBEDDING_MODEL,
             device=config.EMBEDDING_DEVICE,
         )
-        logger.info(f"StEmbeddingClient() is initialized.")
+        logger.info(f"StEmbeddingClient is initialized.")
 
     def embedding(self, text: str | List[str]) -> List[float] | List[List[float]]:
         try:

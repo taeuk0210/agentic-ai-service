@@ -18,6 +18,7 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
             port=config.WEAVIATE_PORT,
             # grpc_port=config.WEAVIATE_GRPC_PORT,
         )
+        logger.info(f"WeaviateVectorDBClient is initialized.")
 
     def create_collection(self, vector_collection: VectorCollection) -> bool:
         try:
@@ -28,7 +29,7 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
                 )
                 return False
 
-            metric_type = metric_type.lower()
+            metric_type = vector_collection.metric_type.lower()
             if metric_type == "l2":
                 metric_type = "l2-squared"
 
@@ -68,9 +69,9 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
             with collection.batch.dynamic() as batch:
                 for item in items:
                     batch.add_object(
-                        properties=item.properties,
-                        vector=item.vector,
                         uuid=item.uuid,
+                        vector=item.vector,
+                        properties=item.properties,
                     )
             return True
 
@@ -84,24 +85,29 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
         self, collection: str, items: List[VectorItem], top_k: int = 5
     ) -> List[VectorItem]:
         try:
-            collection = self.client.collections.get(collection)
-            responses = []
+            vc = self.client.collections.get(collection)
+            all_objects = []
             for item in items:
-                responses.extend(
-                    [
-                        VectorItem(
-                            uuid=obj.uuid,
-                            vector=obj.vector,
-                            properties=obj.properties,
-                        )
-                        for obj in collection.query.near_vector(
-                            near_vector=item.vector,
-                            limit=top_k,
-                            return_metadata=MetadataQuery(distance=True),
-                        ).objects
-                    ]
+                all_objects.extend(
+                    vc.query.near_vector(
+                        near_vector=item.vector,
+                        limit=top_k,
+                        return_properties=True,
+                        return_metadata=MetadataQuery(distance=True),
+                    ).objects
                 )
-            return responses
+            unique_objects = {}
+            for obj in all_objects:
+                unique_objects[obj.uuid] = obj
+
+            return [
+                VectorItem(
+                    uuid=obj.uuid,
+                    vector=[],
+                    properties=obj.properties,
+                )
+                for obj in list(unique_objects.values())[:top_k]
+            ]
 
         except Exception as e:
             logger.error(

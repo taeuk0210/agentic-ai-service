@@ -2,7 +2,6 @@ import os
 from typing import Any
 
 import boto3
-from botocore.exceptions import ClientError
 
 from app.config import config
 from app.logger import logger
@@ -18,15 +17,10 @@ class MinIOStorageClient(BaseStorageClient):
             aws_secret_access_key=config.MINIO_SECRET_KEY,
             region_name="us-east-1",
         )
+        logger.info(f"MinIOStorageClient is initialized.")
 
     def create_bucket(self, bucket: str) -> bool:
         try:
-            try:
-                self.client.head_bucket(Bucket=bucket)
-                return True
-            except ClientError:
-                pass
-
             self.client.create_bucket(Bucket=bucket)
             return True
 
@@ -43,7 +37,7 @@ class MinIOStorageClient(BaseStorageClient):
             logger.error(f"MinIOStorageClient.delete_bucket() error ({bucket}): {e}")
             return False
 
-    def upload_file(self, fileobj: Any, bucket: str, key: str) -> bool:
+    def upload_file(self, bucket: str, key: str, fileobj: Any) -> bool:
         try:
             self.client.upload_fileobj(Fileobj=fileobj, Bucket=bucket, Key=key)
             return True

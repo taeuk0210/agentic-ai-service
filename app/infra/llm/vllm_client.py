@@ -15,6 +15,7 @@ class VLLMClient(BaseLLMClient):
             api_key=config.VLLM_API_KEY,
             timeout=config.VLLM_TIMEOUT,
         )
+        logger.info(f"VLLMClient is initialized.")
 
     def generate(self, req: LLMRequest) -> LLMResponse:
         try:

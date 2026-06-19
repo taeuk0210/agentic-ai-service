@@ -16,7 +16,7 @@ class RedisCacheClient(BaseCacheClient):
             decode_responses=True,
         )
         self.client = redis.Redis(connection_pool=self.pool)
-        logger.info(f"RedisCacheClient() is initialized.")
+        logger.info(f"RedisCacheClient is initialized.")
 
     def get(self, key: str) -> Optional[str]:
         try:

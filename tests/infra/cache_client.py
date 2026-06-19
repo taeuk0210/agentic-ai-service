@@ -4,7 +4,7 @@ import unittest
 from app.infra.cache.redis_client import redis_client
 
 
-class TestRedisCacheClient(unittest.TestCase):
+class TestCacheClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = redis_client

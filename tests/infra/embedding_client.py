@@ -3,7 +3,7 @@ import unittest
 from app.infra.embed.st_client import st_client
 
 
-class TestSentenceTransformerEmbeddingClient(unittest.TestCase):
+class TestEmbeddingClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.client = st_client
@@ -27,7 +27,7 @@ class TestSentenceTransformerEmbeddingClient(unittest.TestCase):
         ]
 
         # when
-        embeddings = self.client.embedding_batch(test_texts)
+        embeddings = self.client.embedding(test_texts)
 
         # then
         self.assertEqual(len(test_texts), len(embeddings))
