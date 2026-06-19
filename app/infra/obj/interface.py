@@ -4,29 +4,21 @@ from typing import Any
 
 class BaseStorageClient(ABC):
     @abstractmethod
-    def create_bucket(self, bucket_name: str) -> bool:
+    def create_bucket(self, bucket: str) -> bool:
         pass
 
     @abstractmethod
-    def delete_bucket(self, bucket_name: str) -> bool:
+    def delete_bucket(self, bucket: str) -> bool:
         pass
 
     @abstractmethod
-    def upload_file(
-        self, local_file_path: str, bucket_name: str, object_name: str
-    ) -> bool:
+    def upload_file(self, fileobj: Any, bucket: str, key: str) -> bool:
         pass
 
     @abstractmethod
-    def upload_fileobj(self, file_obj: Any, bucket_name: str, object_name: str) -> bool:
+    def download_file(self, bucket: str, key: str, download_path: str) -> bool:
         pass
 
     @abstractmethod
-    def download_file(
-        self, bucket_name: str, object_name: str, local_download_path: str
-    ) -> bool:
-        pass
-
-    @abstractmethod
-    def delete_file(self, bucket_name: str, object_name: str) -> bool:
+    def delete_file(self, bucket: str, key: str) -> bool:
         pass

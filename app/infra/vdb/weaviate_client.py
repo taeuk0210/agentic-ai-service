@@ -7,7 +7,7 @@ from weaviate.classes.query import MetadataQuery, Filter
 
 from app.config import config
 from app.logger import logger
-from app.schemas import VectorCreateRequest, VectorQueryResponse
+from app.schemas import VectorCollection, VectorItem
 from app.infra.vdb.interface import BaseVectorDBClient
 
 
@@ -19,20 +19,15 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
             # grpc_port=config.WEAVIATE_GRPC_PORT,
         )
 
-    def has_collection(self, collection_name: str) -> bool:
+    def create_collection(self, vector_collection: VectorCollection) -> bool:
         try:
-            return self.client.collections.exists(name=collection_name)
+            is_exist = self.client.collections.exists(name=vector_collection.collection)
+            if is_exist:
+                logger.error(
+                    f"WeaviateVectorDBClient.create_collection() error: {vector_collection.collection} is already exist"
+                )
+                return False
 
-        except Exception as e:
-            logger.error(
-                f"WeaviateVectorDBClient.has_collection() error ({collection_name}): {e}"
-            )
-            return False
-
-    def create_collection(
-        self, collection_name: str, dimension: int = 1024, metric_type: str = "COSINE"
-    ) -> bool:
-        try:
             metric_type = metric_type.lower()
             if metric_type == "l2":
                 metric_type = "l2-squared"
@@ -40,7 +35,7 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
             metric_type = VectorDistances[metric_type.upper()]
 
             self.client.collections.create(
-                name=collection_name,
+                name=vector_collection.collection,
                 vector_config=[
                     Configure.Vectors.self_provided(
                         name="custom_vector",
@@ -52,44 +47,24 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
 
         except Exception as e:
             logger.error(
-                f"WeaviateVectorDBClient.create_collection() error ({collection_name}): {e}"
+                f"WeaviateVectorDBClient.create_collection() error ({vector_collection.collection}): {e}"
             )
             return False
 
-    def delete_collection(self, collection_name: str) -> bool:
+    def delete_collection(self, collection: str) -> bool:
         try:
-            self.client.collections.delete(name=collection_name)
+            self.client.collections.delete(name=collection)
             return True
 
         except Exception as e:
             logger.error(
-                f"WeaviateVectorDBClient.delete_collection() error ({collection_name}): {e}"
+                f"WeaviateVectorDBClient.delete_collection() error ({collection}): {e}"
             )
             return False
 
-    def query_similarity(
-        self, collection_name: str, vector: List[float], top_k: int = 5
-    ) -> List[VectorQueryResponse]:
+    def upsert_vectors(self, collection: str, items: List[VectorItem]) -> bool:
         try:
-            collection = self.client.collections.get(collection_name)
-            response = collection.query.near_vector(
-                near_vector=vector,
-                limit=top_k,
-                return_metadata=MetadataQuery(distance=True),
-            )
-            return [VectorQueryResponse(uuid=obj.uuid) for obj in response.objects]
-
-        except Exception as e:
-            logger.error(
-                f"WeaviateVectorDBClient.query_similarity() error ({collection_name}): {e}"
-            )
-            return []
-
-    def upsert_vectors(
-        self, collection_name: str, items: List[VectorCreateRequest]
-    ) -> bool:
-        try:
-            collection = self.client.collections.get(collection_name)
+            collection = self.client.collections.get(collection)
             with collection.batch.dynamic() as batch:
                 for item in items:
                     batch.add_object(
@@ -101,13 +76,42 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
 
         except Exception as e:
             logger.error(
-                f"WeaviateVectorDBClient.upsert_vector() error ({collection_name}): {e}"
+                f"WeaviateVectorDBClient.upsert_vector() error ({collection}): {e}"
             )
             return False
 
-    def delete_vectors_by_ids(self, collection_name: str, ids: List[Any]) -> bool:
+    def query_vectors(
+        self, collection: str, items: List[VectorItem], top_k: int = 5
+    ) -> List[VectorItem]:
         try:
-            collection = self.client.collections.get(collection_name)
+            collection = self.client.collections.get(collection)
+            responses = []
+            for item in items:
+                responses.extend(
+                    [
+                        VectorItem(
+                            uuid=obj.uuid,
+                            vector=obj.vector,
+                            properties=obj.properties,
+                        )
+                        for obj in collection.query.near_vector(
+                            near_vector=item.vector,
+                            limit=top_k,
+                            return_metadata=MetadataQuery(distance=True),
+                        ).objects
+                    ]
+                )
+            return responses
+
+        except Exception as e:
+            logger.error(
+                f"WeaviateVectorDBClient.query_vectors() error ({collection}): {e}"
+            )
+            return []
+
+    def delete_vectors(self, collection: str, ids: List[Any]) -> bool:
+        try:
+            collection = self.client.collections.get(collection)
 
             if len(ids) == 1:
                 delete_filter = Filter.by_id().equal(ids[0])
@@ -119,7 +123,7 @@ class WeaviateVectorDBClient(BaseVectorDBClient):
 
         except Exception as e:
             logger.error(
-                f"WeaviateVectorDBClient.upsert_vector() error ({collection_name}): {e}"
+                f"WeaviateVectorDBClient.upsert_vector() error ({collection}): {e}"
             )
             return False
 

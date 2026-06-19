@@ -1,11 +1,11 @@
-from typing import List
+import time
 
 from openai import OpenAI
 
 from app.config import config
 from app.logger import logger
 from app.infra.llm.interface import BaseLLMClient
-from app.schemas import LLMChat
+from app.schemas import LLMRequest, LLMResponse
 
 
 class VLLMClient(BaseLLMClient):
@@ -16,26 +16,28 @@ class VLLMClient(BaseLLMClient):
             timeout=config.VLLM_TIMEOUT,
         )
 
-    def chat_completion(
-        self,
-        system_prompt: str,
-        chat_histories: List[LLMChat],
-        user_prompt: str,
-    ) -> str:
+    def generate(self, req: LLMRequest) -> LLMResponse:
         try:
+            t0 = time.perf_counter()
             response = self.client.chat.completions.create(
                 model=config.VLLM_MODEL,
                 messages=[
-                    {"role": "system", "content": system_prompt},
-                    *[h.model_dump() for h in chat_histories],
-                    {"role": "user", "content": user_prompt},
+                    {"role": "system", "content": req.system_prompt},
+                    *[h.model_dump() for h in req.messages],
+                    {"role": "user", "content": req.user_prompt},
                 ],
-                temperature=0,
+                temperature=req.temperature,
             )
-            return response.choices[0].message
+            t1 = time.perf_counter()
+            return LLMResponse(
+                message=response.choices[0].message,
+                latency=t1 - t0,
+                prompt_token=response.usage.prompt_tokens,
+                completion_tokens=response.usage.completion_tokens,
+            )
 
         except Exception as e:
-            logger.error(f"VLLMClient.chat_completion() error: {e}")
+            logger.error(f"VLLMClient.generate() error: {e}")
         return
 
 

@@ -1,15 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import List
 
-from app.schemas import LLMChat
+
+from app.schemas import LLMRequest, LLMResponse
 
 
 class BaseLLMClient(ABC):
     @abstractmethod
-    def chat_completion(
+    def generate(
         self,
-        system_prompt: str,
-        chat_histories: List[LLMChat],
-        user_prompt: str,
-    ) -> str:
+        req: LLMRequest,
+    ) -> LLMResponse:
         pass

@@ -19,89 +19,59 @@ class MinIOStorageClient(BaseStorageClient):
             region_name="us-east-1",
         )
 
-    def create_bucket(self, bucket_name: str) -> bool:
+    def create_bucket(self, bucket: str) -> bool:
         try:
             try:
-                self.client.head_bucket(Bucket=bucket_name)
+                self.client.head_bucket(Bucket=bucket)
                 return True
             except ClientError:
                 pass
 
-            self.client.create_bucket(Bucket=bucket_name)
+            self.client.create_bucket(Bucket=bucket)
             return True
 
         except Exception as e:
-            logger.error(
-                f"MinIOStorageClient.create_bucket() error ({bucket_name}): {e}"
-            )
+            logger.error(f"MinIOStorageClient.create_bucket() error ({bucket}): {e}")
             return False
 
-    def delete_bucket(self, bucket_name: str) -> bool:
+    def delete_bucket(self, bucket: str) -> bool:
         try:
-            self.client.delete_bucket(Bucket=bucket_name)
+            self.client.delete_bucket(Bucket=bucket)
             return True
 
         except Exception as e:
-            logger.error(
-                f"MinIOStorageClient.delete_bucket() error ({bucket_name}): {e}"
-            )
+            logger.error(f"MinIOStorageClient.delete_bucket() error ({bucket}): {e}")
             return False
 
-    def upload_file(
-        self, local_file_path: str, bucket_name: str, object_name: str
-    ) -> bool:
+    def upload_file(self, fileobj: Any, bucket: str, key: str) -> bool:
         try:
-            if not os.path.exists(local_file_path):
-                return False
-
-            self.client.upload_file(
-                Filename=local_file_path, Bucket=bucket_name, Key=object_name
-            )
+            self.client.upload_fileobj(Fileobj=fileobj, Bucket=bucket, Key=key)
             return True
 
         except Exception as e:
-            logger.error(f"MinIOStorageClient.upload_file() error ({object_name}): {e}")
+            logger.error(f"MinIOStorageClient.upload_file() error ({key}): {e}")
             return False
 
-    def upload_fileobj(self, file_obj: Any, bucket_name: str, object_name: str) -> bool:
+    def download_file(self, bucket: str, key: str, download_path: str) -> bool:
         try:
-            self.client.upload_fileobj(
-                Fileobj=file_obj, Bucket=bucket_name, Key=object_name
-            )
-            return True
-
-        except Exception as e:
-            logger.error(
-                f"MinIOStorageClient.upload_fileobj() error ({object_name}): {e}"
-            )
-            return False
-
-    def download_file(
-        self, bucket_name: str, object_name: str, local_download_path: str
-    ) -> bool:
-        try:
-            local_dir = os.path.dirname(local_download_path)
+            local_dir = os.path.dirname(download_path)
             if local_dir and not os.path.exists(local_dir):
                 os.makedirs(local_dir, exist_ok=True)
 
-            self.client.download_file(
-                Bucket=bucket_name, Key=object_name, Filename=local_download_path
-            )
+            self.client.download_file(Bucket=bucket, Key=key, Filename=download_path)
             return True
 
         except Exception as e:
-            logger.error(
-                f"MinIOStorageClient.download_file() error ({object_name}): {e}"
-            )
+            logger.error(f"MinIOStorageClient.download_file() error ({key}): {e}")
             return False
 
-    def delete_file(self, bucket_name: str, object_name: str) -> bool:
+    def delete_file(self, bucket: str, key: str) -> bool:
         try:
-            self.client.delete_object(Bucket=bucket_name, Key=object_name)
+            self.client.delete_object(Bucket=bucket, Key=key)
             return True
 
         except Exception as e:
-            logger.error(f"MinIOStorageClient.delete_file() error ({object_name}): {e}")
+            logger.error(f"MinIOStorageClient.delete_file() error ({key}): {e}")
             return False
 
 

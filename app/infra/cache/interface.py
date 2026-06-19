@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+
 class BaseCacheClient(ABC):
     @abstractmethod
     def get(self, key: str) -> Optional[str]:

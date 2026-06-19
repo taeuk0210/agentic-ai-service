@@ -1,36 +1,28 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
 
-from app.schemas import VectorCreateRequest, VectorQueryResponse
+from app.schemas import VectorCollection, VectorItem
 
 
 class BaseVectorDBClient(ABC):
     @abstractmethod
-    def has_collection(self, collection_name: str) -> bool:
+    def create_collection(self, vector_collection: VectorCollection) -> bool:
         pass
 
     @abstractmethod
-    def create_collection(
-        self, collection_name: str, dimension: int = 1024, metric_type: str = "COSINE"
-    ) -> bool:
+    def delete_collection(self, collection: str) -> bool:
         pass
 
     @abstractmethod
-    def delete_collection(self, collection_name: str) -> bool:
+    def upsert_vectors(self, collection: str, items: List[VectorItem]) -> bool:
         pass
 
     @abstractmethod
-    def query_similarity(
-        self, collection_name: str, vector: List[float], top_k: int = 5
-    ) -> List[VectorQueryResponse]:
+    def query_vectors(
+        self, collection: str, items: List[VectorItem], top_k: int
+    ) -> List[VectorItem]:
         pass
 
     @abstractmethod
-    def upsert_vectors(
-        self, collection_name: str, items: List[VectorCreateRequest]
-    ) -> bool:
-        pass
-
-    @abstractmethod
-    def delete_vectors_by_ids(self, collection_name: str, ids: List[Any]) -> bool:
+    def delete_vectors(self, collection: str, ids: List[Any]) -> bool:
         pass

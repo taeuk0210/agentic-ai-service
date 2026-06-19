@@ -3,11 +3,6 @@ from typing import Dict, Any
 
 
 class BaseTool(ABC):
-    @property
     @abstractmethod
-    def tool_name(self) -> str:
-        pass
-
-    @abstractmethod
-    def execute(self, params: Dict[str, Any]) -> str:
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         pass

@@ -62,7 +62,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.post("/api/v1/chat", response_model=UserResponse, tags=["Agent"])
+@app.post("/chat", response_model=UserResponse, tags=["chat"])
 def chat(request: UserRequest):
-
-    return agentic_service.chat(request=request)
+    # TODO
+    return UserResponse()

@@ -7,39 +7,32 @@ from app.logger import logger
 from app.infra.embed.interface import BaseEmbeddingClient
 
 
-class SentenceTransformersEmbeddingClient(BaseEmbeddingClient):
+class StEmbeddingClient(BaseEmbeddingClient):
     def __init__(self):
         self.model = SentenceTransformer(
             model_name_or_path=config.EMBEDDING_MODEL,
             device=config.EMBEDDING_DEVICE,
         )
-        logger.info(f"SentenceTransformersEmbeddingClient() is initialized.")
+        logger.info(f"StEmbeddingClient() is initialized.")
 
-    def embedding(self, text: str) -> List[float]:
+    def embedding(self, text: str | List[str]) -> List[float] | List[List[float]]:
         try:
-            embedding = self.model.encode(
-                inputs=text, convert_to_numpy=True, normalize_embeddings=True
-            )
-            return embedding.tolist()
-        except Exception as e:
-            logger.error(f"SentenceTransformersEmbeddingClient.embedding() error: {e}")
-            return []
+            if isinstance(text, List):
+                return self.model.encode(
+                    inputs=text, convert_to_numpy=True, normalize_embeddings=True
+                )
 
-    def embedding_batch(self, texts: List[str]) -> List[List[float]]:
-        try:
-            embeddings = self.model.encode_document(
-                inputs=texts,
+            return self.model.encode_document(
+                inputs=text,
                 batch_size=config.EMBEDDING_BATCH,
                 show_progress_bar=False,
                 convert_to_numpy=True,
                 normalize_embeddings=True,
-            )
-            return embeddings.tolist()
+            ).tolist()
+
         except Exception as e:
-            logger.error(
-                f"SentenceTransformersEmbeddingClient.embedding_batch() error: {e}"
-            )
+            logger.error(f"StEmbeddingClient.embedding() error: {e}")
             return []
 
 
-st_client = SentenceTransformersEmbeddingClient()
+st_client = StEmbeddingClient()
